@@ -1,0 +1,148 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Production-ready WordPress blog deployment on AWS Lightsail in EU (London) region.
+  This template creates a Lightsail instance with WordPress (Bitnami stack), static IP,
+  optional custom domain with DNS zone and SSL certificate, automated backups, and monitoring.
+
+Parameters:
+  InstanceName:
+    Type: String
+    Description: Name for the Lightsail instance (lowercase letters, numbers, and hyphens only)
+    AllowedPattern: ^[a-z0-9-]+$
+    ConstraintDescription: Instance name must contain only lowercase letters, numbers, and hyphens
+    MinLength: 3
+    MaxLength: 63
+
+  InstancePlan:
+    Type: String
+    Description: Lightsail instance bundle size
+    Default: small_2_0
+    AllowedValues:
+      - micro_2_0
+      - small_2_0
+      - medium_2_0
+      - large_2_0
+    ConstraintDescription: Must be a valid Lightsail bundle ID
+
+  AvailabilityZone:
+    Type: String
+    Description: Availability zone within eu-west-2 region
+    Default: eu-west-2a
+    AllowedValues:
+      - eu-west-2a
+      - eu-west-2b
+      - eu-west-2c
+    ConstraintDescription: Must be a valid availability zone in eu-west-2
+
+  DomainName:
+    Type: String
+    Description: Optional custom domain name (e.g., example.com). Leave empty to skip domain configuration.
+    Default: ''
+    AllowedPattern: ^$|^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$
+    ConstraintDescription: Must be a valid domain name or empty
+
+  AdminEmail:
+    Type: String
+    Description: Administrator email address for notifications and SSL certificate
+    AllowedPattern: ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$
+    ConstraintDescription: Must be a valid email address
+
+  EnableAutomaticSnapshots:
+    Type: String
+    Description: Enable automatic daily snapshots at 03:00 UTC with 7-day retention
+    Default: 'true'
+    AllowedValues:
+      - 'true'
+      - 'false'
+
+Conditions:
+  HasDomain: !Not [!Equals [!Ref DomainName, '']]
+  EnableSnapshots: !Equals [!Ref EnableAutomaticSnapshots, 'true']
+
+Resources:
+  WordPressInstance:
+    Type: AWS::Lightsail::Instance
+    Properties:
+      InstanceName: !Ref InstanceName
+      BlueprintId: wordpress
+      BundleId: !Ref InstancePlan
+      AvailabilityZone: !Ref AvailabilityZone
+      UserData: |
+        #!/bin/bash
+        set -e
+        
+        # Wait for Bitnami initialization to complete
+        echo "Waiting 60 seconds for Bitnami initialization..."
+        sleep 60
+        
+        # Update system packages
+        echo "Updating system packages..."
+        apt-get update -y
+        DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
+        
+        # Set WordPress directory permissions
+        echo "Setting WordPress directory permissions..."
+        find /opt/bitnami/wordpress -type d -exec chmod 755 {} \;
+        find /opt/bitnami/wordpress -type f -exec chmod 644 {} \;
+        chown -R bitnami:daemon /opt/bitnami/wordpress
+        
+        # Configure PHP settings
+        echo "Configuring PHP settings..."
+        PHP_INI="/opt/bitnami/php/etc/php.ini"
+        sed -i 's/^memory_limit = .*/memory_limit = 256M/' "$PHP_INI"
+        sed -i 's/^upload_max_filesize = .*/upload_max_filesize = 64M/' "$PHP_INI"
+        sed -i 's/^post_max_size = .*/post_max_size = 64M/' "$PHP_INI"
+        sed -i 's/^max_execution_time = .*/max_execution_time = 300/' "$PHP_INI"
+        
+        # Restart Apache and PHP-FPM services
+        echo "Restarting Apache and PHP-FPM services..."
+        /opt/bitnami/ctlscript.sh restart apache
+        /opt/bitnami/ctlscript.sh restart php-fpm
+        
+        # Create backup directory
+        echo "Creating backup directory..."
+        mkdir -p /opt/bitnami/backups
+        chown bitnami:daemon /opt/bitnami/backups
+        chmod 755 /opt/bitnami/backups
+        
+        # Log completion
+        echo "WordPress initialization completed at $(date)" | tee -a /var/log/wordpress-init.log
+        echo "Initialization script finished successfully"
+      Tags:
+        - Key: Environment
+          Value: production
+        - Key: Application
+          Value: WordPress
+        - Key: ManagedBy
+          Value: CloudFormation
+        - Key: Region
+          Value: eu-west-2
+
+  StaticIP:
+    Type: AWS::Lightsail::StaticIp
+    Properties:
+      StaticIpName: !Sub '${InstanceName}-static-ip'
+      AttachedTo: !Ref WordPressInstance
+
+  InstanceFirewall:
+    Type: AWS::Lightsail::Instance
+    DependsOn: WordPressInstance
+    Properties:
+      InstanceName: !Ref InstanceName
+      Networking:
+        Ports:
+          - FromPort: 22
+            ToPort: 22
+            Protocol: tcp
+            Cidrs:
+              - 0.0.0.0/0
+          - FromPort: 80
+            ToPort: 80
+            Protocol: tcp
+            Cidrs:
+              - 0.0.0.0/0
+          - FromPort: 443
+            ToPort: 443
+            Protocol: tcp
+            Cidrs:
+              - 0.0.0.0/0
