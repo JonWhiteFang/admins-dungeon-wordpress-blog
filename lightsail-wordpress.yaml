@@ -159,3 +159,15 @@ Resources:
         - Name: !Sub 'www.${DomainName}'
           Type: A
           Target: !GetAtt StaticIP.IpAddress
+
+  SSLCertificate:
+    Type: AWS::Lightsail::Certificate
+    Condition: HasDomain
+    Properties:
+      CertificateName: !Sub '${InstanceName}-ssl-cert'
+      DomainName: !Ref DomainName
+      SubjectAlternativeNames:
+        - !Sub 'www.${DomainName}'
+      Tags:
+        - Key: ManagedBy
+          Value: CloudFormation

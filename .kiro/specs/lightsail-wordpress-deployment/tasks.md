@@ -45,7 +45,7 @@
   - Add DomainEntries for www subdomain A record pointing to StaticIP
   - _Requirements: 4.1, 4.2, 4.3_
 
-- [ ] 7. Implement conditional SSL certificate resource
+- [x] 7. Implement conditional SSL certificate resource
   - Define SSLCertificate resource with AWS::Lightsail::Certificate type
   - Add Condition: HasDomain
   - Set CertificateName using Sub function with pattern {InstanceName}-ssl-cert
