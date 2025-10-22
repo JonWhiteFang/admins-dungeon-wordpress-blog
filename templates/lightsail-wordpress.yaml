@@ -67,6 +67,23 @@ Resources:
       BlueprintId: wordpress
       BundleId: !Ref InstancePlan
       AvailabilityZone: !Ref AvailabilityZone
+      Networking:
+        Ports:
+          - FromPort: 22
+            ToPort: 22
+            Protocol: tcp
+            Cidrs:
+              - 0.0.0.0/0
+          - FromPort: 80
+            ToPort: 80
+            Protocol: tcp
+            Cidrs:
+              - 0.0.0.0/0
+          - FromPort: 443
+            ToPort: 443
+            Protocol: tcp
+            Cidrs:
+              - 0.0.0.0/0
       UserData: |
         #!/bin/bash
         set -e
@@ -123,29 +140,6 @@ Resources:
     Properties:
       StaticIpName: !Sub '${InstanceName}-static-ip'
       AttachedTo: !Ref WordPressInstance
-
-  InstanceFirewall:
-    Type: AWS::Lightsail::Instance
-    DependsOn: WordPressInstance
-    Properties:
-      InstanceName: !Ref InstanceName
-      Networking:
-        Ports:
-          - FromPort: 22
-            ToPort: 22
-            Protocol: tcp
-            Cidrs:
-              - 0.0.0.0/0
-          - FromPort: 80
-            ToPort: 80
-            Protocol: tcp
-            Cidrs:
-              - 0.0.0.0/0
-          - FromPort: 443
-            ToPort: 443
-            Protocol: tcp
-            Cidrs:
-              - 0.0.0.0/0
 
   DNSZone:
     Type: AWS::Lightsail::Domain
