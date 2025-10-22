@@ -54,7 +54,7 @@
   - Add ManagedBy tag
   - _Requirements: 4.4_
 
-- [ ] 8. Create CloudFormation outputs
+- [x] 8. Create CloudFormation outputs
   - Define InstanceName output with export name
   - Define StaticIPAddress output using GetAtt function with export name
   - Define WordPressURL output using Sub function with HTTP protocol
@@ -64,7 +64,7 @@
   - Define NextSteps output with multi-line post-deployment instructions
   - _Requirements: 1.5, 2.4, 4.5, 15.3, 15.4_
 
-- [ ] 9. Create MCP server configuration file
+- [x] 9. Create MCP server configuration file
   - Create or update .kiro/settings/mcp.json file
   - Add aws-docs server configuration with uvx command and awslabs.aws-documentation-mcp-server package
   - Configure FASTMCP_LOG_LEVEL environment variable to ERROR
@@ -74,7 +74,7 @@
   - Set disabled to false for both servers
   - _Requirements: 12.1, 12.2, 12.3, 12.4, 12.5_
 
-- [ ] 10. Create deployment automation scripts
+- [x] 10. Create deployment automation scripts
   - Write deploy-stack.sh script with aws cloudformation create-stack command
   - Include all required parameters (instance name, plan, zone, email, domain, snapshots)
   - Add stack monitoring command (describe-stacks with StackStatus query)
@@ -82,14 +82,14 @@
   - Write get-outputs.sh script to retrieve and display stack outputs
   - _Requirements: 1.1, 1.2_
 
-- [ ] 11. Create WordPress configuration scripts
+- [x] 11. Create WordPress configuration scripts
   - Write get-admin-password.sh script with SSH command to retrieve bitnami_application_password
   - Write configure-ssl.sh script with bncert-tool commands for Let's Encrypt
   - Write update-wp-config.sh script to add WP_HOME and WP_SITEURL constants
   - Include HTTPS protocol in WordPress URL constants
   - _Requirements: 14.1, 14.3, 14.4, 14.5, 15.1, 15.2_
 
-- [ ] 12. Create security hardening scripts
+- [x] 12. Create security hardening scripts
   - Write install-security-plugins.sh script with WP-CLI commands
   - Add wp plugin install commands for wordfence, limit-login-attempts-reloaded, and updraftplus
   - Add --activate flag to each plugin install command
@@ -98,7 +98,7 @@
   - Add wp user delete command to remove default "user" account with --reassign flag
   - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6_
 
-- [ ] 13. Create performance optimization scripts
+- [x] 13. Create performance optimization scripts
   - Write install-caching.sh script with WP-CLI commands for wp-super-cache
   - Add wp super-cache enable command
   - Add wp plugin install command for smush with --activate flag
@@ -108,7 +108,7 @@
   - Add wp redis enable command
   - _Requirements: 8.1, 8.2, 8.3_
 
-- [ ] 14. Create backup configuration scripts
+- [x] 14. Create backup configuration scripts
   - Write enable-snapshots.sh script with aws lightsail enable-add-on command
   - Configure AutoSnapshot add-on with snapshotTimeOfDay at 03:00
   - Write verify-snapshots.sh script with aws lightsail get-auto-snapshots command
@@ -116,7 +116,7 @@
   - Include timestamp suffix in YYYYMMDD format using date command
   - _Requirements: 6.1, 6.2, 6.3, 6.4_
 
-- [ ] 15. Create monitoring configuration scripts
+- [x] 15. Create monitoring configuration scripts
   - Write enable-monitoring.sh script with aws lightsail put-instance-metric-data command
   - Write create-alarms.sh script with aws lightsail put-alarm command
   - Configure wordpress-high-cpu alarm with CPUUtilization metric
@@ -124,7 +124,7 @@
   - Set evaluation periods to 2
   - _Requirements: 9.1, 9.2, 9.3_
 
-- [ ] 16. Create health check automation script
+- [x] 16. Create health check automation script
   - Write daily-health-check.sh script with instance name and region variables
   - Add aws lightsail get-instance-state command with query for state.name
   - Add aws lightsail get-instance-metric-data command for CPUUtilization
@@ -133,14 +133,14 @@
   - Add echo statements for output formatting
   - _Requirements: 13.1, 13.2, 13.4_
 
-- [ ] 17. Create backup verification automation script
+- [x] 17. Create backup verification automation script
   - Write verify-backups.sh script with instance name and region variables
   - Add aws lightsail get-instance-snapshots command
   - Configure query to filter by fromInstanceName and limit to 7 most recent
   - Format output as JSON
   - _Requirements: 13.3, 13.5_
 
-- [ ] 18. Create stack management scripts
+- [x] 18. Create stack management scripts
   - Write update-stack.sh script with aws cloudformation update-stack command
   - Include template-body and parameters arguments
   - Write delete-stack.sh script with snapshot creation before deletion
@@ -150,7 +150,7 @@
   - Configure query for TemplateBody and output to file
   - _Requirements: 10.1, 10.2, 10.3, 10.4, 11.1, 11.2, 11.3, 11.4, 11.5_
 
-- [ ] 19. Create deployment documentation
+- [x] 19. Create deployment documentation
   - Write README.md with deployment overview and prerequisites
   - Document all deployment phases with time estimates
   - Include troubleshooting section with common issues and solutions
@@ -159,7 +159,7 @@
   - Document MCP server usage examples
   - _Requirements: All requirements_
 
-- [ ] 20. Create validation and testing scripts
+- [x] 20. Create validation and testing scripts
   - Write validate-template.sh script with aws cloudformation validate-template command
   - Write test-user-data.sh script with bash -n syntax check
   - Write test-deployment.sh script for end-to-end deployment testing

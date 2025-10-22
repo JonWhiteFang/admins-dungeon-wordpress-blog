@@ -1,247 +1,389 @@
-# AWS Lightsail WordPress Deployment
+# WordPress on AWS Lightsail - Infrastructure as Code
 
-Production-ready WordPress blog deployment on AWS Lightsail using Infrastructure as Code (CloudFormation). Deploy a secure, optimized WordPress site in minutes with automated backups, SSL/HTTPS, and monitoring.
+Automated deployment of production-ready WordPress blogs on AWS Lightsail using CloudFormation templates. This solution provides a complete infrastructure setup with security hardening, performance optimization, automated backups, and monitoring.
 
 ## Features
 
-- **Automated Deployment**: Single CloudFormation command creates all infrastructure
-- **Security Hardened**: SSL/HTTPS, security plugins, firewall rules, and access controls
-- **Performance Optimized**: Caching, image optimization, and configurable instance sizing
+- **Automated Deployment**: Single CloudFormation stack creates all infrastructure
+- **Security Hardened**: SSL/HTTPS, security plugins, firewall rules, access controls
+- **Performance Optimized**: Caching, image optimization, configurable instance sizing
 - **Automated Backups**: Daily snapshots with 7-day retention
 - **Monitoring**: CloudWatch metrics and alarms for proactive issue detection
-- **Cost Effective**: Starting at ~$14/month for production-ready hosting
+- **Cost Effective**: ~$14/month for production-ready hosting
+
+## Project Structure
+
+```
+.
+├── templates/
+│   └── lightsail-wordpress.yaml          # CloudFormation template
+├── scripts/
+│   ├── deployment/                       # Stack deployment & management
+│   │   ├── deploy-stack.sh
+│   │   ├── update-stack.sh
+│   │   ├── delete-stack.sh
+│   │   ├── get-outputs.sh
+│   │   ├── export-template.sh
+│   │   ├── validate-template.sh
+│   │   ├── test-user-data.sh
+│   │   └── test-deployment.sh
+│   ├── configuration/                    # WordPress configuration
+│   │   ├── get-admin-password.sh
+│   │   ├── configure-ssl.sh
+│   │   └── update-wp-config.sh
+│   ├── security/                         # Security hardening
+│   │   ├── install-security-plugins.sh
+│   │   ├── create-admin-user.sh
+│   │   └── update-wordpress.sh
+│   ├── performance/                      # Performance optimization
+│   │   ├── install-caching.sh
+│   │   └── install-redis.sh
+│   ├── backup/                           # Backup management
+│   │   ├── enable-snapshots.sh
+│   │   ├── verify-snapshots.sh
+│   │   ├── create-manual-snapshot.sh
+│   │   └── verify-backups.sh
+│   └── monitoring/                       # Monitoring & health checks
+│       ├── enable-monitoring.sh
+│       ├── create-alarms.sh
+│       └── daily-health-check.sh
+├── docs/                                 # Documentation
+│   └── lightsail-wordpress-deployment-prompt.md
+└── README.md
+```
+
+## Prerequisites
+
+- AWS CLI installed and configured
+- AWS account with Lightsail access
+- SSH key pair created in eu-west-2 region (LightsailDefaultKey-eu-west-2)
+- Domain name (optional, for custom domain setup)
+- Basic knowledge of AWS, WordPress, and bash scripting
 
 ## Quick Start
 
-### Prerequisites
-
-- AWS account with billing enabled
-- AWS CLI configured with credentials
-- Domain name (optional but recommended)
-- Email address for SSL notifications
-
-### Deploy in 3 Steps
-
-1. **Clone this repository**
-   ```bash
-   git clone <repository-url>
-   cd lightsail-wordpress-deployment
-   ```
-
-2. **Deploy the stack**
-   ```bash
-   aws cloudformation create-stack \
-     --stack-name wordpress-blog-prod \
-     --template-body file://lightsail-wordpress.yaml \
-     --parameters \
-       ParameterKey=InstanceName,ParameterValue=my-wordpress-blog \
-       ParameterKey=AdminEmail,ParameterValue=your-email@example.com \
-       ParameterKey=DomainName,ParameterValue=yourdomain.com \
-     --region eu-west-2
-   ```
-
-3. **Wait for completion**
-   ```bash
-   aws cloudformation wait stack-create-complete \
-     --stack-name wordpress-blog-prod \
-     --region eu-west-2
-   ```
-
-### Get Your Site Details
+### 1. Validate Template
 
 ```bash
-aws cloudformation describe-stacks \
-  --stack-name wordpress-blog-prod \
-  --region eu-west-2 \
-  --query "Stacks[0].Outputs"
+bash scripts/deployment/validate-template.sh
 ```
 
-## Architecture
+### 2. Deploy Stack
 
-- **Region**: EU (London) - eu-west-2
-- **Compute**: AWS Lightsail instances
-- **Platform**: Bitnami WordPress Stack (Apache, MySQL, PHP)
-- **SSL**: Let's Encrypt via Bitnami bncert-tool
-- **Backups**: Automated daily snapshots
-- **Monitoring**: CloudWatch metrics and alarms
+Edit `scripts/deployment/deploy-stack.sh` to configure your parameters:
+- INSTANCE_NAME
+- INSTANCE_PLAN (micro_2_0, small_2_0, medium_2_0, large_2_0)
+- ADMIN_EMAIL
+- DOMAIN_NAME (optional)
 
-## Configuration Options
-
-### Instance Sizes
-
-| Plan | vCPU | RAM | Storage | Price/Month |
-|------|------|-----|---------|-------------|
-| micro_2_0 | 1 | 1GB | 40GB SSD | $5 |
-| small_2_0 | 1 | 2GB | 60GB SSD | $10 |
-| medium_2_0 | 2 | 4GB | 80GB SSD | $20 |
-| large_2_0 | 2 | 8GB | 160GB SSD | $40 |
-
-### Parameters
-
-- **InstanceName**: Unique name for your instance (lowercase, numbers, hyphens)
-- **InstancePlan**: Instance size (default: small_2_0)
-- **AvailabilityZone**: eu-west-2a, eu-west-2b, or eu-west-2c
-- **DomainName**: Your custom domain (optional)
-- **AdminEmail**: Email for notifications and SSL
-- **EnableAutomaticSnapshots**: Enable daily backups (default: true)
-
-## Post-Deployment Setup
-
-### 1. Retrieve WordPress Admin Password
+Then deploy:
 
 ```bash
-# Get SSH command from stack outputs, then:
-ssh -i ~/.ssh/LightsailDefaultKey-eu-west-2.pem bitnami@YOUR_STATIC_IP
-cat bitnami_application_password
+bash scripts/deployment/deploy-stack.sh
 ```
 
-### 2. Configure SSL (if using custom domain)
+### 3. Get Stack Outputs
 
 ```bash
-# After DNS propagation:
-ssh -i ~/.ssh/LightsailDefaultKey-eu-west-2.pem bitnami@YOUR_STATIC_IP
-sudo /opt/bitnami/bncert-tool
+bash scripts/deployment/get-outputs.sh
 ```
 
-### 3. Install Security Plugins
+### 4. Retrieve Admin Password
 
 ```bash
-cd /opt/bitnami/wordpress
-sudo -u bitnami wp plugin install wordfence --activate
-sudo -u bitnami wp plugin install limit-login-attempts-reloaded --activate
-sudo -u bitnami wp plugin install updraftplus --activate
+bash scripts/configuration/get-admin-password.sh
 ```
 
-### 4. Install Performance Plugins
+### 5. Access WordPress
+
+Navigate to the WordPress admin URL from the stack outputs and log in with:
+- Username: `user`
+- Password: (retrieved from step 4)
+
+## Deployment Phases
+
+### Phase 1: Infrastructure Setup (5-10 minutes)
+- CloudFormation stack creation
+- Lightsail instance provisioning
+- Static IP allocation
+- Firewall configuration
+- DNS zone setup (if domain configured)
+
+### Phase 2: WordPress Configuration (10-15 minutes)
+- System package updates
+- PHP configuration
+- WordPress permissions
+- SSL certificate setup (if domain configured)
+
+### Phase 3: Security Hardening (5-10 minutes)
+- Install security plugins
+- Create new admin user
+- Remove default user
+- Configure security settings
+
+### Phase 4: Performance Optimization (5-10 minutes)
+- Install caching plugins
+- Configure Redis (optional)
+- Optimize images
+
+### Phase 5: Backup & Monitoring (5 minutes)
+- Enable automatic snapshots
+- Configure CloudWatch alarms
+- Verify backup configuration
+
+**Total Deployment Time**: 30-50 minutes
+
+## Post-Deployment Configuration
+
+### Configure SSL Certificate
+
+If using a custom domain:
+
+1. Update DNS nameservers at your registrar (see stack outputs)
+2. Wait for DNS propagation (24-48 hours)
+3. Run SSL configuration:
 
 ```bash
-sudo -u bitnami wp plugin install wp-super-cache --activate
-sudo -u bitnami wp super-cache enable
-sudo -u bitnami wp plugin install smush --activate
+bash scripts/configuration/configure-ssl.sh
 ```
 
-## Management
+### Install Security Plugins
+
+```bash
+bash scripts/security/install-security-plugins.sh
+```
+
+Installed plugins:
+- Wordfence Security
+- Limit Login Attempts Reloaded
+- UpdraftPlus Backup
+
+### Install Caching Plugins
+
+```bash
+bash scripts/performance/install-caching.sh
+```
+
+Installed plugins:
+- WP Super Cache
+- Smush Image Optimization
+
+### Install Redis (Optional)
+
+```bash
+bash scripts/performance/install-redis.sh
+```
+
+### Create New Admin User
+
+```bash
+bash scripts/security/create-admin-user.sh
+```
+
+### Enable Automatic Snapshots
+
+```bash
+bash scripts/backup/enable-snapshots.sh
+```
+
+### Configure Monitoring Alarms
+
+```bash
+bash scripts/monitoring/create-alarms.sh
+```
+
+## Maintenance Scripts
+
+### Update WordPress
+
+```bash
+bash scripts/security/update-wordpress.sh
+```
+
+Updates WordPress core, all plugins, and themes.
+
+### Daily Health Check
+
+```bash
+bash scripts/monitoring/daily-health-check.sh
+```
+
+Checks instance state, CPU utilization, and network traffic.
+
+### Verify Backups
+
+```bash
+bash scripts/backup/verify-backups.sh
+```
+
+Lists recent snapshots and verifies backup status.
+
+### Create Manual Snapshot
+
+```bash
+bash scripts/backup/create-manual-snapshot.sh
+```
 
 ### Update Stack
 
 ```bash
-aws cloudformation update-stack \
-  --stack-name wordpress-blog-prod \
-  --template-body file://lightsail-wordpress.yaml \
-  --parameters ParameterKey=InstancePlan,ParameterValue=medium_2_0 \
-  --region eu-west-2
+bash scripts/deployment/update-stack.sh
 ```
 
-### Create Manual Backup
+### Export Template
 
 ```bash
-aws lightsail create-instance-snapshot \
-  --instance-name my-wordpress-blog \
-  --instance-snapshot-name wordpress-backup-$(date +%Y%m%d) \
-  --region eu-west-2
+bash scripts/deployment/export-template.sh
 ```
 
 ### Delete Stack
 
 ```bash
-# Create final backup first
-aws lightsail create-instance-snapshot \
-  --instance-name my-wordpress-blog \
-  --instance-snapshot-name wordpress-final-backup \
-  --region eu-west-2
-
-# Then delete
-aws cloudformation delete-stack \
-  --stack-name wordpress-blog-prod \
-  --region eu-west-2
+bash scripts/deployment/delete-stack.sh
 ```
 
-## Automation Scripts
+Creates final backup before deletion.
 
-Scripts are available in the `scripts/` directory:
+## Architecture
 
-- `deploy-stack.sh`: Deploy CloudFormation stack with parameters
-- `get-outputs.sh`: Retrieve and display stack outputs
-- `configure-ssl.sh`: Configure Let's Encrypt SSL
-- `install-security-plugins.sh`: Install security plugins
-- `install-caching.sh`: Install and configure caching
-- `enable-snapshots.sh`: Enable automatic snapshots
-- `daily-health-check.sh`: Check instance health
-- `verify-backups.sh`: Verify recent snapshots
+### Components
+
+- **Lightsail Instance**: WordPress (Bitnami stack) on Ubuntu
+- **Static IP**: Persistent IP address for the instance
+- **DNS Zone**: Lightsail DNS for custom domain (optional)
+- **SSL Certificate**: Let's Encrypt via bncert-tool (optional)
+- **Firewall**: Ports 22 (SSH), 80 (HTTP), 443 (HTTPS)
+- **Snapshots**: Automatic daily backups with 7-day retention
+- **CloudWatch**: Metrics and alarms for monitoring
+
+### Instance Sizing
+
+| Plan | vCPUs | RAM | Storage | Transfer | Price/Month |
+|------|-------|-----|---------|----------|-------------|
+| micro_2_0 | 1 | 1 GB | 40 GB SSD | 2 TB | $7 |
+| small_2_0 | 1 | 2 GB | 60 GB SSD | 3 TB | $14 |
+| medium_2_0 | 2 | 4 GB | 80 GB SSD | 4 TB | $28 |
+| large_2_0 | 2 | 8 GB | 160 GB SSD | 5 TB | $56 |
+
+**Recommended**: small_2_0 for production blogs
 
 ## Cost Estimation
 
-**Monthly Costs** (small_2_0 instance):
-- Instance: $10
-- Static IP: Free (while attached)
-- Data transfer: Included
-- Snapshots (7 × 60GB): ~$3
-- **Total: ~$13/month**
+### Monthly Costs (small_2_0 plan)
+- Lightsail instance: $14.00
+- Static IP: $0.00 (included)
+- DNS zone: $0.50
+- Snapshots (7 days): ~$0.50
+- Data transfer: $0.00 (3 TB included)
 
-## Security Best Practices
-
-- Change default admin password immediately
-- Create new admin user and remove default "user" account
-- Keep WordPress, plugins, and themes updated
-- Configure Wordfence security plugin
-- Restrict SSH access to specific IPs
-- Enable HTTPS and force SSL
-- Regular backup verification
-
-## Monitoring
-
-CloudWatch metrics are automatically enabled:
-- CPU Utilization
-- Network In/Out
-- Disk Read/Write
-
-Alarms trigger when:
-- CPU > 80% for 2 consecutive periods
+**Total**: ~$15/month
 
 ## Troubleshooting
 
-### Stack Creation Fails
+### Stack Creation Failed
 
 Check CloudFormation events:
 ```bash
-aws cloudformation describe-stack-events \
-  --stack-name wordpress-blog-prod \
-  --region eu-west-2
+aws cloudformation describe-stack-events --stack-name wordpress-blog-prod --region eu-west-2
 ```
 
 ### WordPress Not Accessible
 
-Verify instance state:
+1. Check instance state:
 ```bash
-aws lightsail get-instance \
-  --instance-name my-wordpress-blog \
-  --region eu-west-2
+aws lightsail get-instance-state --instance-name wordpress-blog-prod-eu-west-2 --region eu-west-2
+```
+
+2. Check initialization logs:
+```bash
+ssh -i ~/.ssh/LightsailDefaultKey-eu-west-2.pem bitnami@<IP> 'cat /var/log/wordpress-init.log'
 ```
 
 ### SSL Certificate Issues
 
-Check DNS propagation:
+1. Verify DNS propagation:
 ```bash
-nslookup yourdomain.com
+dig example.com
 ```
 
-## Documentation
+2. Check bncert-tool logs:
+```bash
+ssh -i ~/.ssh/LightsailDefaultKey-eu-west-2.pem bitnami@<IP> 'sudo cat /opt/bitnami/letsencrypt/letsencrypt.log'
+```
 
-- [Detailed Deployment Guide](lightsail-wordpress-deployment-prompt.md)
-- [Requirements](/.kiro/specs/lightsail-wordpress-deployment/requirements.md)
-- [Design Document](/.kiro/specs/lightsail-wordpress-deployment/design.md)
-- [Implementation Tasks](/.kiro/specs/lightsail-wordpress-deployment/tasks.md)
+### High CPU Usage
+
+1. Check WordPress plugins
+2. Review CloudWatch metrics
+3. Consider upgrading instance plan
+
+### Backup Failures
+
+1. Verify snapshot configuration:
+```bash
+bash scripts/backup/verify-snapshots.sh
+```
+
+2. Check Lightsail service status
+
+## MCP Server Usage
+
+This project uses MCP (Model Context Protocol) servers for enhanced AWS documentation access:
+
+### Configured Servers
+
+- **aws-docs**: AWS documentation search and retrieval
+- **aws-core**: AWS expert guidance and prompt understanding
+
+### Example Queries
+
+```
+# Search AWS documentation
+"How do I configure Lightsail firewall rules?"
+
+# Get CloudFormation guidance
+"What are best practices for CloudFormation templates?"
+
+# Troubleshoot issues
+"Why is my Lightsail instance not accessible?"
+```
+
+## Security Best Practices
+
+1. **Change default admin credentials** immediately after deployment
+2. **Enable automatic updates** for WordPress core and plugins
+3. **Configure Wordfence** firewall and malware scanning
+4. **Limit login attempts** to prevent brute force attacks
+5. **Regular backups** - verify snapshots weekly
+6. **Monitor security logs** in WordPress admin
+7. **Keep plugins minimal** - only install what you need
+8. **Use strong passwords** for all accounts
+9. **Enable two-factor authentication** (via plugin)
+10. **Regular security audits** using Wordfence scans
+
+## Performance Optimization
+
+1. **Enable WP Super Cache** for page caching
+2. **Configure Redis** for object caching
+3. **Optimize images** with Smush
+4. **Use CDN** for static assets (optional)
+5. **Minimize plugins** - deactivate unused plugins
+6. **Database optimization** - use WP-Optimize plugin
+7. **Monitor performance** with CloudWatch metrics
+8. **Upgrade instance** if consistently high CPU usage
 
 ## Support
 
-- AWS Lightsail Documentation: https://lightsail.aws.amazon.com/
-- WordPress Support: https://wordpress.org/support/
-- CloudFormation Documentation: https://docs.aws.amazon.com/cloudformation/
+For issues or questions:
+1. Check troubleshooting section above
+2. Review AWS Lightsail documentation
+3. Check WordPress Bitnami documentation
+4. Review CloudFormation stack events
 
 ## License
 
-MIT License - See LICENSE file for details
+This project is provided as-is for educational and production use.
 
 ## Contributing
 
-Contributions welcome! Please open an issue or submit a pull request.
+Contributions welcome! Please test changes thoroughly before submitting.

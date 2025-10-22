@@ -1,77 +1,82 @@
-# Technology Stack
+---
+inclusion: always
+---
 
-## Infrastructure
+# Technology Stack & Commands
 
-- **Cloud Provider**: AWS (eu-west-2 region)
-- **Compute**: AWS Lightsail instances
-- **IaC**: AWS CloudFormation (YAML templates)
-- **DNS**: Lightsail DNS zones
-- **SSL**: Let's Encrypt via Bitnami bncert-tool
+## Stack Overview
 
-## Application Stack
+**Infrastructure**: AWS Lightsail (eu-west-2) | CloudFormation (YAML) | Let's Encrypt SSL
+**Application**: WordPress (Bitnami) | Apache 2.4 | MySQL | PHP | WP Super Cache/Redis
+**Tools**: AWS CLI | WP-CLI | Bash | CloudWatch
 
-- **CMS**: WordPress (Bitnami stack)
-- **Web Server**: Apache 2.4
-- **Database**: MySQL
-- **Runtime**: PHP
-- **Caching**: WP Super Cache, Redis (optional)
+## Required AWS CLI Patterns
 
-## Automation & Tools
+**Always include `--region eu-west-2`** in CloudFormation commands.
 
-- **CLI**: AWS CLI, WP-CLI
-- **Scripting**: Bash
-- **Documentation**: MCP AWS Documentation Server, MCP AWS Core Server
-- **Monitoring**: AWS CloudWatch
-
-## Common Commands
-
-### Deployment
+**Stack Operations**:
 ```bash
-# Create stack
-aws cloudformation create-stack --stack-name wordpress-blog-prod --template-body file://lightsail-wordpress.yaml --parameters ParameterKey=InstanceName,ParameterValue=wordpress-blog-prod-eu-west-2 --region eu-west-2
+# Create
+aws cloudformation create-stack --stack-name wordpress-blog-prod \
+  --template-body file://templates/lightsail-wordpress.yaml \
+  --parameters ParameterKey=InstanceName,ParameterValue=wordpress-blog-prod-eu-west-2 \
+  --region eu-west-2
 
-# Monitor stack creation
-aws cloudformation describe-stacks --stack-name wordpress-blog-prod --region eu-west-2 --query "Stacks[0].StackStatus"
+# Monitor status
+aws cloudformation describe-stacks --stack-name wordpress-blog-prod \
+  --region eu-west-2 --query "Stacks[0].StackStatus"
 
 # Wait for completion
 aws cloudformation wait stack-create-complete --stack-name wordpress-blog-prod --region eu-west-2
-```
 
-### Management
-```bash
-# Get stack outputs
-aws cloudformation describe-stacks --stack-name wordpress-blog-prod --region eu-west-2 --query "Stacks[0].Outputs"
+# Get outputs (connection details)
+aws cloudformation describe-stacks --stack-name wordpress-blog-prod \
+  --region eu-west-2 --query "Stacks[0].Outputs"
 
-# Update stack
-aws cloudformation update-stack --stack-name wordpress-blog-prod --template-body file://lightsail-wordpress.yaml --region eu-west-2
+# Update
+aws cloudformation update-stack --stack-name wordpress-blog-prod \
+  --template-body file://templates/lightsail-wordpress.yaml --region eu-west-2
 
-# Delete stack
+# Delete
 aws cloudformation delete-stack --stack-name wordpress-blog-prod --region eu-west-2
 ```
 
-### WordPress Management (via SSH)
+**Template Validation** (always run before deployment):
 ```bash
-# Update WordPress core
+aws cloudformation validate-template --template-body file://templates/lightsail-wordpress.yaml
+```
+
+## WordPress Management (SSH)
+
+All WP-CLI commands run as `bitnami` user:
+```bash
 sudo -u bitnami wp core update
-
-# Update all plugins
 sudo -u bitnami wp plugin update --all
-
-# Install plugin
-sudo -u bitnami wp plugin install plugin-name --activate
+sudo -u bitnami wp plugin install <name> --activate
 ```
 
-### Validation
+## Script Validation
+
+Test bash syntax before execution:
 ```bash
-# Validate CloudFormation template
-aws cloudformation validate-template --template-body file://lightsail-wordpress.yaml
-
-# Test bash script syntax
-bash -n script-name.sh
+bash -n scripts/<category>/<script-name>.sh
 ```
 
-## MCP Server Configuration
+## MCP Server Usage
 
-Required MCP servers in `.kiro/settings/mcp.json`:
-- **aws-docs**: AWS documentation access (awslabs.aws-documentation-mcp-server)
-- **aws-core**: AWS expert guidance (mcp-aws-core)
+**Use MCP tools instead of shell commands when available:**
+- AWS documentation queries → `mcp_aws_docs_search_documentation`, `mcp_aws_docs_read_documentation`
+- AWS expert guidance → `mcp_aws_core_prompt_understanding` (call first for AWS questions)
+- File operations → Filesystem MCP tools (see mcp-server-usage.md)
+
+**Required servers** in `.kiro/settings/mcp.json`:
+- `aws-docs` (awslabs.aws-documentation-mcp-server)
+- `aws-core` (mcp-aws-core)
+
+## Key Constraints
+
+- Region locked to `eu-west-2` (London)
+- Stack name: `wordpress-blog-prod`
+- Instance naming: `{InstanceName}-{resource-type}`
+- Template path: `templates/lightsail-wordpress.yaml`
+- All infrastructure changes go through CloudFormation (no manual AWS console edits)

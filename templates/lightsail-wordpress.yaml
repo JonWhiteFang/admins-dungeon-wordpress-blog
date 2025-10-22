@@ -171,3 +171,51 @@ Resources:
       Tags:
         - Key: ManagedBy
           Value: CloudFormation
+
+Outputs:
+  InstanceName:
+    Description: Name of the Lightsail WordPress instance
+    Value: !Ref InstanceName
+    Export:
+      Name: !Sub '${AWS::StackName}-InstanceName'
+
+  StaticIPAddress:
+    Description: Static IP address assigned to the WordPress instance
+    Value: !GetAtt StaticIP.IpAddress
+    Export:
+      Name: !Sub '${AWS::StackName}-StaticIP'
+
+  WordPressURL:
+    Description: WordPress site URL (HTTP)
+    Value: !Sub 'http://${StaticIP.IpAddress}'
+
+  WordPressAdminURL:
+    Description: WordPress admin dashboard URL
+    Value: !Sub 'http://${StaticIP.IpAddress}/wp-admin'
+
+  SSHCommand:
+    Description: SSH command to connect to the instance
+    Value: !Sub 'ssh -i ~/.ssh/LightsailDefaultKey-eu-west-2.pem bitnami@${StaticIP.IpAddress}'
+
+  DomainNameServers:
+    Condition: HasDomain
+    Description: Lightsail nameservers for domain configuration
+    Value: |
+      ns-1.awsdns.com
+      ns-2.awsdns.co.uk
+      ns-3.awsdns.org
+      ns-4.awsdns.net
+
+  NextSteps:
+    Description: Post-deployment instructions
+    Value: |
+      1. Retrieve admin password: ssh bitnami@<IP> 'cat /home/bitnami/bitnami_application_password'
+      2. Access WordPress admin at http://<IP>/wp-admin with username 'user'
+      3. If using custom domain, update DNS nameservers at your registrar
+      4. Configure SSL certificate: ssh to instance and run 'sudo /opt/bitnami/bncert-tool'
+      5. Install security plugins: Wordfence, Limit Login Attempts, UpdraftPlus
+      6. Install caching plugins: WP Super Cache, Smush
+      7. Enable automatic snapshots if not already enabled
+      8. Configure CloudWatch alarms for monitoring
+      9. Update WordPress core, plugins, and themes regularly
+      10. Create a new admin user and delete the default 'user' account
