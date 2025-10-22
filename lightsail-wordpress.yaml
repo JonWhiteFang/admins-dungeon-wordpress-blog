@@ -146,3 +146,16 @@ Resources:
             Protocol: tcp
             Cidrs:
               - 0.0.0.0/0
+
+  DNSZone:
+    Type: AWS::Lightsail::Domain
+    Condition: HasDomain
+    Properties:
+      DomainName: !Ref DomainName
+      DomainEntries:
+        - Name: !Ref DomainName
+          Type: A
+          Target: !GetAtt StaticIP.IpAddress
+        - Name: !Sub 'www.${DomainName}'
+          Type: A
+          Target: !GetAtt StaticIP.IpAddress

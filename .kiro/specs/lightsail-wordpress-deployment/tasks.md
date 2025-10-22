@@ -37,7 +37,7 @@
   - Set Cidrs to 0.0.0.0/0 for all ports
   - _Requirements: 3.1, 3.2, 3.3, 3.4_
 
-- [ ] 6. Implement conditional DNS zone resource
+- [x] 6. Implement conditional DNS zone resource
   - Define DNSZone resource with AWS::Lightsail::Domain type
   - Add Condition: HasDomain
   - Configure DomainName from parameter
