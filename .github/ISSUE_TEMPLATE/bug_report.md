@@ -32,7 +32,7 @@ Paste any error messages here
 **CloudFormation Events**
 ```bash
 # Output of:
-aws cloudformation describe-stack-events --stack-name YOUR_STACK_NAME --region eu-west-2
+aws cloudformation describe-stack-events --stack-name YOUR_STACK_NAME --region us-east-1
 ```
 
 **Environment**

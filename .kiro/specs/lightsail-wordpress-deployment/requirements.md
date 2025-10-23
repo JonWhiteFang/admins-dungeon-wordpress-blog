@@ -26,7 +26,7 @@ This document specifies the requirements for deploying and managing a production
 
 #### Acceptance Criteria
 
-1. THE CloudFormation Stack SHALL create a Lightsail Instance with the WordPress blueprint in the eu-west-2 region
+1. THE CloudFormation Stack SHALL create a Lightsail Instance with the WordPress blueprint in the us-east-1 region
 2. THE CloudFormation Stack SHALL accept parameters for instance name, instance plan, availability zone, domain name, admin email, and snapshot configuration
 3. THE CloudFormation Stack SHALL validate that the instance name contains only lowercase letters, numbers, and hyphens
 4. THE CloudFormation Stack SHALL validate that the admin email matches the pattern for valid email addresses
@@ -38,7 +38,7 @@ This document specifies the requirements for deploying and managing a production
 
 #### Acceptance Criteria
 
-1. THE CloudFormation Stack SHALL create a Static IP resource in the eu-west-2 region
+1. THE CloudFormation Stack SHALL create a Static IP resource in the us-east-1 region
 2. THE CloudFormation Stack SHALL attach the Static IP to the Lightsail Instance
 3. THE CloudFormation Stack SHALL name the Static IP using the pattern "{InstanceName}-static-ip"
 4. THE CloudFormation Stack SHALL export the Static IP address value for cross-stack references

@@ -2,8 +2,8 @@
 set -e
 
 # Configuration
-INSTANCE_NAME="wordpress-blog-prod-eu-west-2"
-REGION="eu-west-2"
+INSTANCE_NAME="wordpress-blog-prod-us-east-1"
+REGION="us-east-1"
 
 echo "Installing and configuring Redis for WordPress object caching"
 echo ""
@@ -24,7 +24,7 @@ echo "Instance IP: $STATIC_IP"
 echo ""
 
 # SSH to instance and install Redis
-ssh -i ~/.ssh/LightsailDefaultKey-eu-west-2.pem bitnami@"$STATIC_IP" << 'EOF'
+ssh -i ~/.ssh/LightsailDefaultKey-us-east-1.pem bitnami@"$STATIC_IP" << 'EOF'
 echo "Installing Redis server..."
 sudo apt-get update
 sudo apt-get install -y redis-server

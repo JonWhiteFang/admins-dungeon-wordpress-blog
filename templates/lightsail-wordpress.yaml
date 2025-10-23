@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: >
-  Production-ready WordPress blog deployment on AWS Lightsail in EU (London) region.
+  Production-ready WordPress blog deployment on AWS Lightsail in US East (N. Virginia) region.
   This template creates a Lightsail instance with WordPress (Bitnami stack), static IP,
   optional custom domain with DNS zone and SSL certificate, automated backups, and monitoring.
 
@@ -26,13 +26,16 @@ Parameters:
 
   AvailabilityZone:
     Type: String
-    Description: Availability zone within eu-west-2 region
-    Default: eu-west-2a
+    Description: Availability zone within us-east-1 region
+    Default: us-east-1a
     AllowedValues:
-      - eu-west-2a
-      - eu-west-2b
-      - eu-west-2c
-    ConstraintDescription: Must be a valid availability zone in eu-west-2
+      - us-east-1a
+      - us-east-1b
+      - us-east-1c
+      - us-east-1d
+      - us-east-1e
+      - us-east-1f
+    ConstraintDescription: Must be a valid availability zone in us-east-1
 
   DomainName:
     Type: String
@@ -133,7 +136,7 @@ Resources:
         - Key: ManagedBy
           Value: CloudFormation
         - Key: Region
-          Value: eu-west-2
+          Value: us-east-1
 
   StaticIP:
     Type: AWS::Lightsail::StaticIp
@@ -189,7 +192,7 @@ Outputs:
 
   SSHCommand:
     Description: SSH command to connect to the instance
-    Value: !Sub 'ssh -i ~/.ssh/LightsailDefaultKey-eu-west-2.pem bitnami@${StaticIP.IpAddress}'
+    Value: !Sub 'ssh -i ~/.ssh/LightsailDefaultKey-us-east-1.pem bitnami@${StaticIP.IpAddress}'
 
   DomainNameServers:
     Condition: HasDomain

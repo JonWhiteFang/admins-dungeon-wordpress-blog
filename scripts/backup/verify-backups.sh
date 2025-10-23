@@ -2,8 +2,8 @@
 set -e
 
 # Configuration
-INSTANCE_NAME="wordpress-blog-prod-eu-west-2"
-REGION="eu-west-2"
+INSTANCE_NAME="wordpress-blog-prod-us-east-1"
+REGION="us-east-1"
 MAX_SNAPSHOTS=7
 
 echo "=== Backup Verification Report ==="

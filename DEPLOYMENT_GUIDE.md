@@ -53,7 +53,7 @@ This guide walks you through the complete deployment process, from downloading t
 
 - Email address (for SSL certificate notifications)
 - Domain name (optional, but recommended for production)
-- SSH key pair in eu-west-2 region (will be created if needed)
+- SSH key pair in us-east-1 region (will be created if needed)
 
 ---
 
@@ -89,7 +89,7 @@ aws configure
 Enter the following when prompted:
 - **AWS Access Key ID**: Your IAM user access key
 - **AWS Secret Access Key**: Your IAM user secret key
-- **Default region name**: `eu-west-2`
+- **Default region name**: `us-east-1`
 - **Default output format**: `json`
 
 ### Step 3: Verify AWS Configuration
@@ -99,26 +99,26 @@ Enter the following when prompted:
 aws sts get-caller-identity
 
 # Verify Lightsail access
-aws lightsail get-regions --region eu-west-2 --query "regions[?name=='eu-west-2']"
+aws lightsail get-regions --region us-east-1 --query "regions[?name=='us-east-1']"
 ```
 
-Expected output should show your AWS account details and eu-west-2 region information.
+Expected output should show your AWS account details and us-east-1 region information.
 
 ### Step 4: Create SSH Key Pair (if needed)
 
 ```bash
 # Check if key already exists
-aws lightsail get-key-pair --key-pair-name LightsailDefaultKey-eu-west-2 --region eu-west-2
+aws lightsail get-key-pair --key-pair-name LightsailDefaultKey-us-east-1 --region us-east-1
 
 # If key doesn't exist, create it
 aws lightsail create-key-pair \
-  --key-pair-name LightsailDefaultKey-eu-west-2 \
-  --region eu-west-2 \
+  --key-pair-name LightsailDefaultKey-us-east-1 \
+  --region us-east-1 \
   --query 'privateKeyBase64' \
-  --output text > ~/.ssh/LightsailDefaultKey-eu-west-2.pem
+  --output text > ~/.ssh/LightsailDefaultKey-us-east-1.pem
 
 # Set correct permissions
-chmod 400 ~/.ssh/LightsailDefaultKey-eu-west-2.pem
+chmod 400 ~/.ssh/LightsailDefaultKey-us-east-1.pem
 ```
 
 ---
@@ -148,13 +148,13 @@ Update these variables:
 
 ```bash
 # Required Configuration
-INSTANCE_NAME="wordpress-blog-prod-eu-west-2"  # Keep as-is or customize
+INSTANCE_NAME="wordpress-blog-prod-us-east-1"  # Keep as-is or customize
 INSTANCE_PLAN="small_2_0"                      # Choose from table above
 ADMIN_EMAIL="your-email@example.com"           # YOUR EMAIL HERE
 
 # Optional Configuration
 DOMAIN_NAME=""                                  # Add your domain or leave empty
-AVAILABILITY_ZONE="eu-west-2a"                 # Usually keep default
+AVAILABILITY_ZONE="us-east-1a"                 # Usually keep default
 ENABLE_SNAPSHOTS="true"                        # Keep enabled for backups
 ```
 
@@ -193,9 +193,9 @@ bash scripts/deployment/deploy-stack.sh
 This process takes **5-10 minutes**. You'll see:
 ```
 Deploying WordPress stack: wordpress-blog-prod
-Instance: wordpress-blog-prod-eu-west-2
+Instance: wordpress-blog-prod-us-east-1
 Plan: small_2_0
-Region: eu-west-2
+Region: us-east-1
 
 Stack creation initiated. Monitoring status...
 Current status: CREATE_IN_PROGRESS
@@ -238,7 +238,7 @@ Example output:
 },
 {
   "OutputKey": "SSHCommand",
-  "OutputValue": "ssh -i ~/.ssh/LightsailDefaultKey-eu-west-2.pem bitnami@18.130.123.45"
+  "OutputValue": "ssh -i ~/.ssh/LightsailDefaultKey-us-east-1.pem bitnami@18.130.123.45"
 }
 ```
 
@@ -255,7 +255,7 @@ WordPress needs additional time to complete initialization:
 sleep 300
 
 # Or check initialization logs
-ssh -i ~/.ssh/LightsailDefaultKey-eu-west-2.pem bitnami@<YOUR_STATIC_IP> \
+ssh -i ~/.ssh/LightsailDefaultKey-us-east-1.pem bitnami@52.206.160.25 \
   'tail -f /var/log/wordpress-init.log'
 ```
 
@@ -517,7 +517,7 @@ Once DNS has propagated:
 
 ```bash
 # SSH to your instance
-ssh -i ~/.ssh/LightsailDefaultKey-eu-west-2.pem bitnami@<YOUR_STATIC_IP>
+ssh -i ~/.ssh/LightsailDefaultKey-us-east-1.pem bitnami@<YOUR_STATIC_IP>
 
 # Run SSL configuration tool
 sudo /opt/bitnami/bncert-tool
@@ -642,16 +642,16 @@ You should see:
 ```bash
 # 1. Verify instance is running
 aws lightsail get-instance-state \
-  --instance-name wordpress-blog-prod-eu-west-2 \
-  --region eu-west-2
+  --instance-name wordpress-blog-prod-us-east-1 \
+  --region us-east-1
 
 # 2. Check SSH key permissions
-chmod 400 ~/.ssh/LightsailDefaultKey-eu-west-2.pem
+chmod 400 ~/.ssh/LightsailDefaultKey-us-east-1.pem
 
 # 3. Verify firewall allows SSH (port 22)
 aws lightsail get-instance-port-states \
-  --instance-name wordpress-blog-prod-eu-west-2 \
-  --region eu-west-2
+  --instance-name wordpress-blog-prod-us-east-1 \
+  --region us-east-1
 
 # 4. Use Lightsail browser-based SSH as alternative
 # Go to AWS Console → Lightsail → Instance → Connect
@@ -667,15 +667,15 @@ aws lightsail get-instance-port-states \
 sleep 300
 
 # 2. Check initialization logs
-ssh -i ~/.ssh/LightsailDefaultKey-eu-west-2.pem bitnami@<IP> \
+ssh -i ~/.ssh/LightsailDefaultKey-us-east-1.pem bitnami@<IP> \
   'cat /var/log/wordpress-init.log'
 
 # 3. Verify Apache is running
-ssh -i ~/.ssh/LightsailDefaultKey-eu-west-2.pem bitnami@<IP> \
+ssh -i ~/.ssh/LightsailDefaultKey-us-east-1.pem bitnami@<IP> \
   'sudo /opt/bitnami/ctlscript.sh status apache'
 
 # 4. Restart Apache if needed
-ssh -i ~/.ssh/LightsailDefaultKey-eu-west-2.pem bitnami@<IP> \
+ssh -i ~/.ssh/LightsailDefaultKey-us-east-1.pem bitnami@<IP> \
   'sudo /opt/bitnami/ctlscript.sh restart apache'
 ```
 
@@ -688,7 +688,7 @@ ssh -i ~/.ssh/LightsailDefaultKey-eu-west-2.pem bitnami@<IP> \
 # 1. Check stack events for error details
 aws cloudformation describe-stack-events \
   --stack-name wordpress-blog-prod \
-  --region eu-west-2 \
+  --region us-east-1 \
   --query "StackEvents[?ResourceStatus=='CREATE_FAILED']"
 
 # 2. Common issues:
@@ -700,7 +700,7 @@ aws cloudformation describe-stack-events \
 # 3. Delete failed stack
 aws cloudformation delete-stack \
   --stack-name wordpress-blog-prod \
-  --region eu-west-2
+  --region us-east-1
 
 # 4. Fix the issue in deploy-stack.sh and retry
 bash scripts/deployment/deploy-stack.sh
@@ -721,7 +721,7 @@ dig yourdomain.com +short
 # 3. Wait longer (DNS can take up to 48 hours)
 
 # 4. Re-run bncert-tool
-ssh -i ~/.ssh/LightsailDefaultKey-eu-west-2.pem bitnami@<IP>
+ssh -i ~/.ssh/LightsailDefaultKey-us-east-1.pem bitnami@<IP>
 sudo /opt/bitnami/bncert-tool
 
 # 5. Check Let's Encrypt logs
@@ -767,8 +767,8 @@ bash scripts/backup/create-manual-snapshot.sh
 
 # 4. Check Lightsail service status
 aws lightsail get-instance \
-  --instance-name wordpress-blog-prod-eu-west-2 \
-  --region eu-west-2 \
+  --instance-name wordpress-blog-prod-us-east-1 \
+  --region us-east-1 \
   --query "instance.addOns"
 ```
 
@@ -779,7 +779,7 @@ aws lightsail get-instance \
 **Solutions**:
 ```bash
 # 1. Whitelist your IP in Limit Login Attempts
-ssh -i ~/.ssh/LightsailDefaultKey-eu-west-2.pem bitnami@<IP>
+ssh -i ~/.ssh/LightsailDefaultKey-us-east-1.pem bitnami@<IP>
 cd /opt/bitnami/wordpress
 sudo -u bitnami wp plugin deactivate limit-login-attempts-reloaded
 exit
@@ -801,7 +801,7 @@ exit
 ### Weekly (Manual)
 ```bash
 # Check for WordPress updates
-ssh -i ~/.ssh/LightsailDefaultKey-eu-west-2.pem bitnami@<IP>
+ssh -i ~/.ssh/LightsailDefaultKey-us-east-1.pem bitnami@<IP>
 cd /opt/bitnami/wordpress
 sudo -u bitnami wp core check-update
 sudo -u bitnami wp plugin list --update=available
@@ -821,12 +821,12 @@ bash scripts/backup/verify-backups.sh
 aws cloudwatch get-metric-statistics \
   --namespace AWS/Lightsail \
   --metric-name CPUUtilization \
-  --dimensions Name=InstanceName,Value=wordpress-blog-prod-eu-west-2 \
+  --dimensions Name=InstanceName,Value=wordpress-blog-prod-us-east-1 \
   --start-time $(date -u -d '30 days ago' +%Y-%m-%dT%H:%M:%S) \
   --end-time $(date -u +%Y-%m-%dT%H:%M:%S) \
   --period 86400 \
   --statistics Average \
-  --region eu-west-2
+  --region us-east-1
 
 # Review costs
 aws ce get-cost-and-usage \
@@ -863,7 +863,7 @@ Use this checklist to verify your deployment:
 
 - [ ] AWS CLI configured and tested
 - [ ] Repository cloned and scripts reviewed
-- [ ] SSH key pair created in eu-west-2
+- [ ] SSH key pair created in us-east-1
 - [ ] Deployment script configured with your details
 - [ ] CloudFormation template validated
 - [ ] Stack deployed successfully (5-10 minutes)
@@ -938,13 +938,13 @@ bash scripts/deployment/delete-stack.sh
 # 3. Verify deletion
 aws cloudformation describe-stacks \
   --stack-name wordpress-blog-prod \
-  --region eu-west-2
+  --region us-east-1
 
 # 4. Manually delete snapshots if needed (to stop snapshot costs)
-aws lightsail get-instance-snapshots --region eu-west-2
+aws lightsail get-instance-snapshots --region us-east-1
 aws lightsail delete-instance-snapshot \
   --instance-snapshot-name <snapshot-name> \
-  --region eu-west-2
+  --region us-east-1
 ```
 
 ---

@@ -6,39 +6,39 @@ inclusion: always
 
 ## Stack Overview
 
-**Infrastructure**: AWS Lightsail (eu-west-2) | CloudFormation (YAML) | Let's Encrypt SSL
+**Infrastructure**: AWS Lightsail (us-east-1) | CloudFormation (YAML) | Let's Encrypt SSL
 **Application**: WordPress (Bitnami) | Apache 2.4 | MySQL | PHP | WP Super Cache/Redis
 **Tools**: AWS CLI | WP-CLI | Bash | CloudWatch
 
 ## Required AWS CLI Patterns
 
-**Always include `--region eu-west-2`** in CloudFormation commands.
+**Always include `--region us-east-1`** in CloudFormation commands.
 
 **Stack Operations**:
 ```bash
 # Create
 aws cloudformation create-stack --stack-name wordpress-blog-prod \
   --template-body file://templates/lightsail-wordpress.yaml \
-  --parameters ParameterKey=InstanceName,ParameterValue=wordpress-blog-prod-eu-west-2 \
-  --region eu-west-2
+  --parameters ParameterKey=InstanceName,ParameterValue=wordpress-blog-prod-us-east-1 \
+  --region us-east-1
 
 # Monitor status
 aws cloudformation describe-stacks --stack-name wordpress-blog-prod \
-  --region eu-west-2 --query "Stacks[0].StackStatus"
+  --region us-east-1 --query "Stacks[0].StackStatus"
 
 # Wait for completion
-aws cloudformation wait stack-create-complete --stack-name wordpress-blog-prod --region eu-west-2
+aws cloudformation wait stack-create-complete --stack-name wordpress-blog-prod --region us-east-1
 
 # Get outputs (connection details)
 aws cloudformation describe-stacks --stack-name wordpress-blog-prod \
-  --region eu-west-2 --query "Stacks[0].Outputs"
+  --region us-east-1 --query "Stacks[0].Outputs"
 
 # Update
 aws cloudformation update-stack --stack-name wordpress-blog-prod \
-  --template-body file://templates/lightsail-wordpress.yaml --region eu-west-2
+  --template-body file://templates/lightsail-wordpress.yaml --region us-east-1
 
 # Delete
-aws cloudformation delete-stack --stack-name wordpress-blog-prod --region eu-west-2
+aws cloudformation delete-stack --stack-name wordpress-blog-prod --region us-east-1
 ```
 
 **Template Validation** (always run before deployment):
@@ -75,7 +75,7 @@ bash -n scripts/<category>/<script-name>.sh
 
 ## Key Constraints
 
-- Region locked to `eu-west-2` (London)
+- Region locked to `us-east-1` (N. Virginia)
 - Stack name: `wordpress-blog-prod`
 - Instance naming: `{InstanceName}-{resource-type}`
 - Template path: `templates/lightsail-wordpress.yaml`

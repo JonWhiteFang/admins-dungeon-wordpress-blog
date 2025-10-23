@@ -58,7 +58,7 @@ Description: 'AWS Lightsail WordPress Blog Deployment - Production Ready'
 Parameters:
   InstanceName:
     Type: String
-    Default: wordpress-blog-prod-eu-west-2
+    Default: wordpress-blog-prod-us-east-1
     Description: Name for the Lightsail WordPress instance
     AllowedPattern: ^[a-z0-9-]+$
     ConstraintDescription: Must contain only lowercase letters, numbers, and hyphens
@@ -75,12 +75,12 @@ Parameters:
 
   AvailabilityZone:
     Type: String
-    Default: eu-west-2a
+    Default: us-east-1a
     Description: Availability zone for the instance
     AllowedValues:
-      - eu-west-2a
-      - eu-west-2b
-      - eu-west-2c
+      - us-east-1a
+      - us-east-1b
+      - us-east-1c
 
   DomainName:
     Type: String
@@ -121,7 +121,7 @@ Resources:
         - Key: ManagedBy
           Value: CloudFormation
         - Key: Region
-          Value: eu-west-2
+          Value: us-east-1
       UserData: !Sub |
         #!/bin/bash
         # Wait for Bitnami to complete initialization
@@ -240,7 +240,7 @@ Outputs:
 
   SSHCommand:
     Description: SSH command to connect to the instance
-    Value: !Sub 'ssh -i ~/.ssh/LightsailDefaultKey-eu-west-2.pem bitnami@${StaticIP.IpAddress}'
+    Value: !Sub 'ssh -i ~/.ssh/LightsailDefaultKey-us-east-1.pem bitnami@${StaticIP.IpAddress}'
 
   DomainNameServers:
     Condition: HasDomain
@@ -264,7 +264,7 @@ Outputs:
 1. **Verify AWS CLI Configuration**
    ```bash
    aws configure list
-   aws lightsail get-regions --query "regions[?name=='eu-west-2']"
+   aws lightsail get-regions --query "regions[?name=='us-east-1']"
    ```
 
 2. **Use MCP AWS Core for Guidance**
@@ -283,20 +283,20 @@ Outputs:
      --stack-name wordpress-blog-prod \
      --template-body file://lightsail-wordpress.yaml \
      --parameters \
-       ParameterKey=InstanceName,ParameterValue=wordpress-blog-prod-eu-west-2 \
+       ParameterKey=InstanceName,ParameterValue=wordpress-blog-prod-us-east-1 \
        ParameterKey=InstancePlan,ParameterValue=small_2_0 \
-       ParameterKey=AvailabilityZone,ParameterValue=eu-west-2a \
+       ParameterKey=AvailabilityZone,ParameterValue=us-east-1a \
        ParameterKey=AdminEmail,ParameterValue=jono2411@outlook.com \
        ParameterKey=DomainName,ParameterValue=yourdomain.com \
        ParameterKey=EnableAutomaticSnapshots,ParameterValue=true \
-     --region eu-west-2
+     --region us-east-1
    ```
 
 2. **Monitor Stack Creation**
    ```bash
    aws cloudformation describe-stacks \
      --stack-name wordpress-blog-prod \
-     --region eu-west-2 \
+     --region us-east-1 \
      --query "Stacks[0].StackStatus"
    ```
 
@@ -304,7 +304,7 @@ Outputs:
    ```bash
    aws cloudformation wait stack-create-complete \
      --stack-name wordpress-blog-prod \
-     --region eu-west-2
+     --region us-east-1
    ```
 
 ### Phase 3: Retrieve Deployment Information (2 minutes)
@@ -313,7 +313,7 @@ Outputs:
    ```bash
    aws cloudformation describe-stacks \
      --stack-name wordpress-blog-prod \
-     --region eu-west-2 \
+     --region us-east-1 \
      --query "Stacks[0].Outputs"
    ```
 
@@ -328,7 +328,7 @@ Outputs:
 1. **Retrieve Admin Password**
    ```bash
    # Use SSH command from stack outputs
-   ssh -i ~/.ssh/LightsailDefaultKey-eu-west-2.pem bitnami@YOUR_STATIC_IP
+   ssh -i ~/.ssh/LightsailDefaultKey-us-east-1.pem bitnami@YOUR_STATIC_IP
    cat bitnami_application_password
    ```
 
@@ -354,12 +354,12 @@ Outputs:
    ```bash
    aws lightsail get-domain \
      --domain-name yourdomain.com \
-     --region eu-west-2
+     --region us-east-1
    ```
 
 3. **Enable HTTPS via Bitnami Tool**
    ```bash
-   ssh -i ~/.ssh/LightsailDefaultKey-eu-west-2.pem bitnami@YOUR_STATIC_IP
+   ssh -i ~/.ssh/LightsailDefaultKey-us-east-1.pem bitnami@YOUR_STATIC_IP
    sudo /opt/bitnami/bncert-tool
    ```
    - Follow prompts to configure Let's Encrypt SSL
@@ -383,31 +383,31 @@ Outputs:
 1. **Enable Automatic Snapshots via CLI**
    ```bash
    aws lightsail enable-add-on \
-     --resource-name wordpress-blog-prod-eu-west-2 \
+     --resource-name wordpress-blog-prod-us-east-1 \
      --add-on-request addOnType=AutoSnapshot,autoSnapshotAddOnRequest={snapshotTimeOfDay=03:00} \
-     --region eu-west-2
+     --region us-east-1
    ```
 
 2. **Verify Snapshot Configuration**
    ```bash
    aws lightsail get-auto-snapshots \
-     --resource-name wordpress-blog-prod-eu-west-2 \
-     --region eu-west-2
+     --resource-name wordpress-blog-prod-us-east-1 \
+     --region us-east-1
    ```
 
 3. **Create Manual Snapshot (Baseline)**
    ```bash
    aws lightsail create-instance-snapshot \
-     --instance-name wordpress-blog-prod-eu-west-2 \
+     --instance-name wordpress-blog-prod-us-east-1 \
      --instance-snapshot-name wordpress-baseline-$(date +%Y%m%d) \
-     --region eu-west-2
+     --region us-east-1
    ```
 
 ### Phase 7: Security Hardening (15 minutes)
 
 1. **Install Security Plugins via WP-CLI**
    ```bash
-   ssh -i ~/.ssh/LightsailDefaultKey-eu-west-2.pem bitnami@YOUR_STATIC_IP
+   ssh -i ~/.ssh/LightsailDefaultKey-us-east-1.pem bitnami@YOUR_STATIC_IP
    cd /opt/bitnami/wordpress
    
    # Install Wordfence
@@ -444,7 +444,7 @@ Outputs:
 
 1. **Install Caching Plugin**
    ```bash
-   ssh -i ~/.ssh/LightsailDefaultKey-eu-west-2.pem bitnami@YOUR_STATIC_IP
+   ssh -i ~/.ssh/LightsailDefaultKey-us-east-1.pem bitnami@YOUR_STATIC_IP
    cd /opt/bitnami/wordpress
    sudo -u bitnami wp plugin install wp-super-cache --activate
    sudo -u bitnami wp super-cache enable
@@ -468,20 +468,20 @@ Outputs:
 1. **Enable CloudWatch Metrics**
    ```bash
    aws lightsail put-instance-metric-data \
-     --instance-name wordpress-blog-prod-eu-west-2 \
-     --region eu-west-2
+     --instance-name wordpress-blog-prod-us-east-1 \
+     --region us-east-1
    ```
 
 2. **Create CloudWatch Alarms**
    ```bash
    aws lightsail put-alarm \
      --alarm-name wordpress-high-cpu \
-     --monitored-resource-name wordpress-blog-prod-eu-west-2 \
+     --monitored-resource-name wordpress-blog-prod-us-east-1 \
      --metric-name CPUUtilization \
      --comparison-operator GreaterThanThreshold \
      --threshold 80 \
      --evaluation-periods 2 \
-     --region eu-west-2
+     --region us-east-1
    ```
 
 3. **Use MCP to Query Metrics**
@@ -498,7 +498,7 @@ aws cloudformation update-stack \
   --template-body file://lightsail-wordpress.yaml \
   --parameters \
     ParameterKey=InstancePlan,ParameterValue=medium_2_0 \
-  --region eu-west-2
+  --region us-east-1
 ```
 
 ### Delete Stack (Cleanup)
@@ -506,14 +506,14 @@ aws cloudformation update-stack \
 ```bash
 # Create final backup before deletion
 aws lightsail create-instance-snapshot \
-  --instance-name wordpress-blog-prod-eu-west-2 \
+  --instance-name wordpress-blog-prod-us-east-1 \
   --instance-snapshot-name wordpress-final-backup-$(date +%Y%m%d) \
-  --region eu-west-2
+  --region us-east-1
 
 # Delete stack
 aws cloudformation delete-stack \
   --stack-name wordpress-blog-prod \
-  --region eu-west-2
+  --region us-east-1
 ```
 
 ### Export Stack Template
@@ -521,7 +521,7 @@ aws cloudformation delete-stack \
 ```bash
 aws cloudformation get-template \
   --stack-name wordpress-blog-prod \
-  --region eu-west-2 \
+  --region us-east-1 \
   --query TemplateBody \
   --output text > exported-template.yaml
 ```
@@ -557,8 +557,8 @@ Ask Kiro:
 #!/bin/bash
 # daily-health-check.sh
 
-INSTANCE_NAME="wordpress-blog-prod-eu-west-2"
-REGION="eu-west-2"
+INSTANCE_NAME="wordpress-blog-prod-us-east-1"
+REGION="us-east-1"
 
 # Check instance state
 STATE=$(aws lightsail get-instance-state \
@@ -587,8 +587,8 @@ aws lightsail get-instance-metric-data \
 #!/bin/bash
 # verify-backups.sh
 
-INSTANCE_NAME="wordpress-blog-prod-eu-west-2"
-REGION="eu-west-2"
+INSTANCE_NAME="wordpress-blog-prod-us-east-1"
+REGION="us-east-1"
 
 # List recent snapshots
 aws lightsail get-instance-snapshots \
@@ -623,7 +623,7 @@ Ask Kiro via MCP:
    ```bash
    aws cloudformation describe-stack-events \
      --stack-name wordpress-blog-prod \
-     --region eu-west-2
+     --region us-east-1
    ```
 
 2. **Use MCP for Documentation**
@@ -634,15 +634,15 @@ Ask Kiro via MCP:
 1. **Verify Instance State**
    ```bash
    aws lightsail get-instance \
-     --instance-name wordpress-blog-prod-eu-west-2 \
-     --region eu-west-2
+     --instance-name wordpress-blog-prod-us-east-1 \
+     --region us-east-1
    ```
 
 2. **Check Firewall Rules**
    ```bash
    aws lightsail get-instance-port-states \
-     --instance-name wordpress-blog-prod-eu-west-2 \
-     --region eu-west-2
+     --instance-name wordpress-blog-prod-us-east-1 \
+     --region us-east-1
    ```
 
 ### SSL Certificate Issues
@@ -656,7 +656,7 @@ Ask Kiro via MCP:
 2. **Check Certificate Status**
    ```bash
    aws lightsail get-certificates \
-     --region eu-west-2
+     --region us-east-1
    ```
 
 3. **Use MCP for Guidance**

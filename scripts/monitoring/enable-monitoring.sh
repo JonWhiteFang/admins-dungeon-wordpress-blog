@@ -2,8 +2,8 @@
 set -e
 
 # Configuration
-INSTANCE_NAME="wordpress-blog-prod-eu-west-2"
-REGION="eu-west-2"
+INSTANCE_NAME="wordpress-blog-prod-us-east-1"
+REGION="us-east-1"
 
 echo "Enabling CloudWatch monitoring for instance: $INSTANCE_NAME"
 echo ""
@@ -15,12 +15,15 @@ echo "Verifying CloudWatch metrics are being collected..."
 echo ""
 
 # Get recent CPU utilization metrics
+START_TIME=$(date -u -v-1H '+%Y-%m-%dT%H:%M:%S')
+END_TIME=$(date -u '+%Y-%m-%dT%H:%M:%S')
+
 aws lightsail get-instance-metric-data \
   --instance-name "$INSTANCE_NAME" \
   --metric-name CPUUtilization \
   --period 300 \
-  --start-time "$(date -u -d '1 hour ago' +%s)" \
-  --end-time "$(date -u +%s)" \
+  --start-time "$START_TIME" \
+  --end-time "$END_TIME" \
   --unit Percent \
   --statistics Average \
   --region "$REGION" \

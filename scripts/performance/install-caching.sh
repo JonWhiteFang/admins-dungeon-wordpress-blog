@@ -2,8 +2,8 @@
 set -e
 
 # Configuration
-INSTANCE_NAME="wordpress-blog-prod-eu-west-2"
-REGION="eu-west-2"
+INSTANCE_NAME="wordpress-blog-prod-us-east-1"
+REGION="us-east-1"
 
 echo "Installing WordPress caching and optimization plugins"
 echo ""
@@ -24,18 +24,18 @@ echo "Instance IP: $STATIC_IP"
 echo ""
 
 # SSH to instance and install caching plugins
-ssh -i ~/.ssh/LightsailDefaultKey-eu-west-2.pem bitnami@"$STATIC_IP" << 'EOF'
+ssh -i ~/.ssh/LightsailDefaultKey-us-east-1.pem bitnami@"$STATIC_IP" << 'EOF'
 cd /opt/bitnami/wordpress
 
 echo "Installing WP Super Cache..."
-sudo -u bitnami wp plugin install wp-super-cache --activate
+sudo /opt/bitnami/wp-cli/bin/wp plugin install wp-super-cache --activate --allow-root --path=/opt/bitnami/wordpress
 
 echo "Enabling WP Super Cache..."
-sudo -u bitnami wp super-cache enable
+sudo /opt/bitnami/wp-cli/bin/wp super-cache enable --allow-root --path=/opt/bitnami/wordpress
 
 echo ""
 echo "Installing Smush Image Optimization..."
-sudo -u bitnami wp plugin install wp-smushit --activate
+sudo /opt/bitnami/wp-cli/bin/wp plugin install wp-smushit --activate --allow-root --path=/opt/bitnami/wordpress
 
 echo ""
 echo "✓ Caching plugins installed successfully!"

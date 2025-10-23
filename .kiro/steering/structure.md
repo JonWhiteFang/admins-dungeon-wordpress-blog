@@ -40,7 +40,7 @@ docs/                                 # Deployment guides and documentation
 
 **CloudFormation Resources**:
 - Stack: `wordpress-blog-prod`
-- Instance: `wordpress-blog-prod-eu-west-2`
+- Instance: `wordpress-blog-prod-us-east-1`
 - Pattern: `{InstanceName}-{resource-type}`
 
 **Scripts**:
@@ -63,8 +63,8 @@ docs/                                 # Deployment guides and documentation
 - Control script: `/opt/bitnami/ctlscript.sh`
 
 **AWS Configuration**:
-- Region: `eu-west-2` (London)
-- AZs: `eu-west-2a`, `eu-west-2b`, `eu-west-2c`
+- Region: `us-east-1` (N. Virginia)
+- AZs: `us-east-1a`, `us-east-1b`, `us-east-1c`, `us-east-1d`, `us-east-1e`, `us-east-1f`
 
 ## Script Organization by Purpose
 

@@ -3,8 +3,8 @@ set -e
 
 # Configuration
 STACK_NAME="wordpress-blog-prod"
-INSTANCE_NAME="wordpress-blog-prod-eu-west-2"
-REGION="eu-west-2"
+INSTANCE_NAME="wordpress-blog-prod-us-east-1"
+REGION="us-east-1"
 
 echo "=== WordPress Stack Deletion ==="
 echo "Stack: $STACK_NAME"

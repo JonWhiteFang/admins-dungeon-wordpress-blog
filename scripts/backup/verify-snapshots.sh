@@ -2,8 +2,8 @@
 set -e
 
 # Configuration
-INSTANCE_NAME="wordpress-blog-prod-eu-west-2"
-REGION="eu-west-2"
+INSTANCE_NAME="wordpress-blog-prod-us-east-1"
+REGION="us-east-1"
 
 echo "Verifying automatic snapshots for instance: $INSTANCE_NAME"
 echo ""

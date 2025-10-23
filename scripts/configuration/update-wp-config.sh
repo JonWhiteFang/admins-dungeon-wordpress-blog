@@ -2,8 +2,8 @@
 set -e
 
 # Configuration
-INSTANCE_NAME="wordpress-blog-prod-eu-west-2"
-REGION="eu-west-2"
+INSTANCE_NAME="wordpress-blog-prod-us-east-1"
+REGION="us-east-1"
 DOMAIN_NAME="example.com"  # Update with your domain
 USE_HTTPS="true"  # Set to "false" if not using SSL
 
@@ -38,7 +38,7 @@ echo "Setting WordPress URLs to: $SITE_URL"
 echo ""
 
 # SSH to instance and update wp-config.php
-ssh -i ~/.ssh/LightsailDefaultKey-eu-west-2.pem bitnami@"$STATIC_IP" << EOF
+ssh -i ~/.ssh/LightsailDefaultKey-us-east-1.pem bitnami@"$STATIC_IP" << EOF
 # Backup wp-config.php
 sudo cp /opt/bitnami/wordpress/wp-config.php /opt/bitnami/wordpress/wp-config.php.backup
 

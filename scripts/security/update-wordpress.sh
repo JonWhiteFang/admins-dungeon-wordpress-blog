@@ -2,8 +2,8 @@
 set -e
 
 # Configuration
-INSTANCE_NAME="wordpress-blog-prod-eu-west-2"
-REGION="eu-west-2"
+INSTANCE_NAME="wordpress-blog-prod-us-east-1"
+REGION="us-east-1"
 
 echo "Updating WordPress core, plugins, and themes"
 echo ""
@@ -24,7 +24,7 @@ echo "Instance IP: $STATIC_IP"
 echo ""
 
 # SSH to instance and update WordPress
-ssh -i ~/.ssh/LightsailDefaultKey-eu-west-2.pem bitnami@"$STATIC_IP" << 'EOF'
+ssh -i ~/.ssh/LightsailDefaultKey-us-east-1.pem bitnami@"$STATIC_IP" << 'EOF'
 cd /opt/bitnami/wordpress
 
 echo "Checking for WordPress core updates..."

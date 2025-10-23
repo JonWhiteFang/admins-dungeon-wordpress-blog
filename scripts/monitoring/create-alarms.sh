@@ -2,9 +2,9 @@
 set -e
 
 # Configuration
-INSTANCE_NAME="wordpress-blog-prod-eu-west-2"
-REGION="eu-west-2"
-NOTIFICATION_EMAIL="your-email@example.com"  # Update with your email
+INSTANCE_NAME="wordpress-blog-prod-us-east-1"
+REGION="us-east-1"
+NOTIFICATION_EMAIL="jono2411@outlook.com"
 
 echo "Creating CloudWatch alarms for instance: $INSTANCE_NAME"
 echo "Notification email: $NOTIFICATION_EMAIL"

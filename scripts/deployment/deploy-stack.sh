@@ -4,14 +4,14 @@ set -e
 # Configuration
 STACK_NAME="wordpress-blog-prod"
 TEMPLATE_FILE="templates/lightsail-wordpress.yaml"
-REGION="eu-west-2"
+REGION="us-east-1"
 
 # Parameters (customize these)
-INSTANCE_NAME="wordpress-blog-prod-eu-west-2"
+INSTANCE_NAME="wordpress-blog-prod-us-east-1"
 INSTANCE_PLAN="small_2_0"  # Options: micro_2_0, small_2_0, medium_2_0, large_2_0
-AVAILABILITY_ZONE="eu-west-2a"
-ADMIN_EMAIL="your-email@example.com"
-DOMAIN_NAME=""  # Leave empty to skip domain configuration
+AVAILABILITY_ZONE="us-east-1b"
+ADMIN_EMAIL="jono2411@outlook.com"
+DOMAIN_NAME="admin-dungeon.co.uk"  # Leave empty to skip domain configuration
 ENABLE_SNAPSHOTS="true"
 
 echo "Deploying WordPress stack: $STACK_NAME"

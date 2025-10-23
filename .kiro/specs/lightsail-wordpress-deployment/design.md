@@ -30,7 +30,7 @@ This design document describes the architecture and implementation approach for 
 
 ```mermaid
 graph TB
-    subgraph "AWS Cloud - eu-west-2"
+    subgraph "AWS Cloud - us-east-1"
         subgraph "CloudFormation Stack"
             CFN[CloudFormation Template]
             CFN --> LI[Lightsail Instance]
@@ -113,8 +113,8 @@ sequenceDiagram
 
 ### Network Architecture
 
-- **Region**: eu-west-2 (London)
-- **Availability Zone**: eu-west-2a (configurable to eu-west-2b or eu-west-2c)
+- **Region**: us-east-1 (London)
+- **Availability Zone**: us-east-1a (configurable to us-east-1b or us-east-1c)
 - **Static IP**: Public IPv4 address attached to instance
 - **Firewall**: Instance-level firewall with port-based rules
 - **DNS**: Lightsail-managed DNS zone with A records
@@ -136,7 +136,7 @@ sequenceDiagram
 ```yaml
 InstanceName: String (pattern: ^[a-z0-9-]+$)
 InstancePlan: String (micro_2_0 | small_2_0 | medium_2_0 | large_2_0)
-AvailabilityZone: String (eu-west-2a | eu-west-2b | eu-west-2c)
+AvailabilityZone: String (us-east-1a | us-east-1b | us-east-1c)
 DomainName: String (optional)
 AdminEmail: String (email pattern validation)
 EnableAutomaticSnapshots: String (true | false)
@@ -165,8 +165,8 @@ EnableAutomaticSnapshots: String (true | false)
 **Configuration**:
 - Blueprint: wordpress (Bitnami WordPress Stack)
 - Bundle: Configurable (micro_2_0 to large_2_0)
-- Region: eu-west-2
-- Availability Zone: Configurable within eu-west-2
+- Region: us-east-1
+- Availability Zone: Configurable within us-east-1
 - Tags: Environment, Application, ManagedBy, Region
 
 **Networking**:
@@ -210,7 +210,7 @@ EnableAutomaticSnapshots: String (true | false)
 **Configuration**:
 - Name: {InstanceName}-static-ip
 - Attached to: WordPressInstance
-- Region: eu-west-2
+- Region: us-east-1
 
 **Behavior**:
 - Persists across instance stops/starts

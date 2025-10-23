@@ -2,8 +2,8 @@
 set -e
 
 # Configuration
-INSTANCE_NAME="wordpress-blog-prod-eu-west-2"
-REGION="eu-west-2"
+INSTANCE_NAME="wordpress-blog-prod-us-east-1"
+REGION="us-east-1"
 
 echo "Retrieving WordPress admin password for instance: $INSTANCE_NAME"
 echo ""
@@ -25,7 +25,7 @@ echo ""
 
 # SSH to instance and retrieve password
 echo "Connecting via SSH to retrieve password..."
-ssh -i ~/.ssh/LightsailDefaultKey-eu-west-2.pem bitnami@"$STATIC_IP" \
+ssh -i ~/.ssh/LightsailDefaultKey-us-east-1.pem bitnami@"$STATIC_IP" \
   'cat /home/bitnami/bitnami_application_password'
 
 echo ""

@@ -2,8 +2,8 @@
 set -e
 
 # Configuration
-INSTANCE_NAME="wordpress-blog-prod-eu-west-2"
-REGION="eu-west-2"
+INSTANCE_NAME="wordpress-blog-prod-us-east-1"
+REGION="us-east-1"
 
 echo "=== WordPress Instance Health Check ==="
 echo "Instance: $INSTANCE_NAME"
@@ -29,12 +29,15 @@ echo ""
 
 # Check CPU utilization (past 1 hour)
 echo "=== CPU Utilization (Past 1 Hour) ==="
+# macOS/BSD date compatible syntax
+START_TIME=$(date -u -v-1H +%s)
+END_TIME=$(date -u +%s)
 CPU_DATA=$(aws lightsail get-instance-metric-data \
   --instance-name "$INSTANCE_NAME" \
   --metric-name CPUUtilization \
   --period 3600 \
-  --start-time "$(date -u -d '1 hour ago' +%s)" \
-  --end-time "$(date -u +%s)" \
+  --start-time "$START_TIME" \
+  --end-time "$END_TIME" \
   --unit Percent \
   --statistics Average \
   --region "$REGION" \
@@ -60,8 +63,8 @@ NETWORK_IN=$(aws lightsail get-instance-metric-data \
   --instance-name "$INSTANCE_NAME" \
   --metric-name NetworkIn \
   --period 3600 \
-  --start-time "$(date -u -d '1 hour ago' +%s)" \
-  --end-time "$(date -u +%s)" \
+  --start-time "$START_TIME" \
+  --end-time "$END_TIME" \
   --unit Bytes \
   --statistics Sum \
   --region "$REGION" \
@@ -72,8 +75,8 @@ NETWORK_OUT=$(aws lightsail get-instance-metric-data \
   --instance-name "$INSTANCE_NAME" \
   --metric-name NetworkOut \
   --period 3600 \
-  --start-time "$(date -u -d '1 hour ago' +%s)" \
-  --end-time "$(date -u +%s)" \
+  --start-time "$START_TIME" \
+  --end-time "$END_TIME" \
   --unit Bytes \
   --statistics Sum \
   --region "$REGION" \

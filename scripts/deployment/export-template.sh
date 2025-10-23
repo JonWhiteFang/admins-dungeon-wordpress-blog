@@ -3,7 +3,7 @@ set -e
 
 # Configuration
 STACK_NAME="wordpress-blog-prod"
-REGION="eu-west-2"
+REGION="us-east-1"
 OUTPUT_FILE="exported-template.yaml"
 
 echo "Exporting CloudFormation template for stack: $STACK_NAME"

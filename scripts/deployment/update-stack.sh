@@ -4,12 +4,12 @@ set -e
 # Configuration
 STACK_NAME="wordpress-blog-prod"
 TEMPLATE_FILE="templates/lightsail-wordpress.yaml"
-REGION="eu-west-2"
+REGION="us-east-1"
 
 # Parameters (customize these to match your current configuration)
-INSTANCE_NAME="wordpress-blog-prod-eu-west-2"
+INSTANCE_NAME="wordpress-blog-prod-us-east-1"
 INSTANCE_PLAN="small_2_0"
-AVAILABILITY_ZONE="eu-west-2a"
+AVAILABILITY_ZONE="us-east-1a"
 ADMIN_EMAIL="your-email@example.com"
 DOMAIN_NAME=""
 ENABLE_SNAPSHOTS="true"

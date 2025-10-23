@@ -56,7 +56,7 @@ Automated deployment of production-ready WordPress blogs on AWS Lightsail using 
 
 - AWS CLI installed and configured
 - AWS account with Lightsail access
-- SSH key pair created in eu-west-2 region (LightsailDefaultKey-eu-west-2)
+- SSH key pair created in us-east-1 region (LightsailDefaultKey-us-east-1)
 - Domain name (optional, for custom domain setup)
 - Basic knowledge of AWS, WordPress, and bash scripting
 
@@ -284,19 +284,19 @@ Creates final backup before deletion.
 
 Check CloudFormation events:
 ```bash
-aws cloudformation describe-stack-events --stack-name wordpress-blog-prod --region eu-west-2
+aws cloudformation describe-stack-events --stack-name wordpress-blog-prod --region us-east-1
 ```
 
 ### WordPress Not Accessible
 
 1. Check instance state:
 ```bash
-aws lightsail get-instance-state --instance-name wordpress-blog-prod-eu-west-2 --region eu-west-2
+aws lightsail get-instance-state --instance-name wordpress-blog-prod-us-east-1 --region us-east-1
 ```
 
 2. Check initialization logs:
 ```bash
-ssh -i ~/.ssh/LightsailDefaultKey-eu-west-2.pem bitnami@<IP> 'cat /var/log/wordpress-init.log'
+ssh -i ~/.ssh/LightsailDefaultKey-us-east-1.pem bitnami@<IP> 'cat /var/log/wordpress-init.log'
 ```
 
 ### SSL Certificate Issues
@@ -308,7 +308,7 @@ dig example.com
 
 2. Check bncert-tool logs:
 ```bash
-ssh -i ~/.ssh/LightsailDefaultKey-eu-west-2.pem bitnami@<IP> 'sudo cat /opt/bitnami/letsencrypt/letsencrypt.log'
+ssh -i ~/.ssh/LightsailDefaultKey-us-east-1.pem bitnami@<IP> 'sudo cat /opt/bitnami/letsencrypt/letsencrypt.log'
 ```
 
 ### High CPU Usage

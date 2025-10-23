@@ -6,7 +6,7 @@ inclusion: always
 
 ## What This Project Does
 
-Automated IaC solution for deploying production-ready WordPress blogs on AWS Lightsail using CloudFormation. Single-command deployment creates fully configured instances in eu-west-2 with security, performance, backups, and monitoring built-in.
+Automated IaC solution for deploying production-ready WordPress blogs on AWS Lightsail using CloudFormation. Single-command deployment creates fully configured instances in us-east-1 with security, performance, backups, and monitoring built-in.
 
 ## Core Capabilities
 
